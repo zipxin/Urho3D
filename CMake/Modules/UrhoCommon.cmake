@@ -1693,16 +1693,18 @@ macro (_setup_target)
         set_target_properties (${TARGET_NAME} PROPERTIES ${TARGET_PROPERTIES})
         unset (TARGET_PROPERTIES)
     endif ()
-    # Setup resource checker
+    # Setup custom resource checker target
     if ((EXE_TYPE STREQUAL MACOSX_BUNDLE OR URHO3D_PACKAGING) AND RESOURCE_DIRS)
-        # Urho3D project builds the PackageTool as required; downstream project uses PackageTool found in the Urho3D build tree or Urho3D SDK
-        find_Urho3d_tool (PACKAGE_TOOL PackageTool
-            HINTS ${CMAKE_BINARY_DIR}/bin/tool ${URHO3D_HOME}/bin/tool
-            DOC "Path to PackageTool" MSG_MODE WARNING)
-        if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
-            set (PACKAGING_DEP DEPENDS PackageTool)
+        if (URHO3D_PACKAGING)
+            # Urho3D project builds the PackageTool as required; downstream project uses PackageTool found in the Urho3D build tree or Urho3D SDK
+            find_Urho3d_tool (PACKAGE_TOOL PackageTool
+                HINTS ${CMAKE_BINARY_DIR}/bin/tool ${URHO3D_HOME}/bin/tool
+                DOC "Path to PackageTool" MSG_MODE WARNING)
+            if (CMAKE_PROJECT_NAME STREQUAL Urho3D)
+                set (PACKAGING_DEP DEPENDS PackageTool)
+            endif ()
+            set (PACKAGING_COMMENT " and packaging")
         endif ()
-        set (PACKAGING_COMMENT " and packaging")
         # Share a same custom target that checks for a same resource dirs list
         foreach (DIR ${RESOURCE_DIRS})
             string (MD5 MD5 ${DIR})
