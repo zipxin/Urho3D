@@ -99,13 +99,14 @@ UI::UI(Context* context) :
     nonFocusedMouseWheel_(true),     // Default Mac OS X and Linux behaviour
 #endif
     useSystemClipboard_(false),
-#if defined(__ANDROID__) || defined(IOS)
+#if defined(__ANDROID__) || defined(IOS) || defined(TVOS)
     useScreenKeyboard_(true),
 #else
     useScreenKeyboard_(false),
 #endif
     useMutableGlyphs_(false),
     forceAutoHint_(false),
+    fontHintLevel_(FONT_HINT_LEVEL_NORMAL),
     uiRendered_(false),
     nonModalBatchSize_(0),
     dragElementsCount_(0),
@@ -605,6 +606,15 @@ void UI::SetForceAutoHint(bool enable)
     }
 }
 
+void UI::SetFontHintLevel(FontHintLevel level)
+{
+    if (level != fontHintLevel_)
+    {
+        fontHintLevel_ = level;
+        ReleaseFontFaces();
+    }
+}
+
 void UI::SetScale(float scale)
 {
     uiScale_ = Max(scale, M_EPSILON);
@@ -1007,19 +1017,16 @@ void UI::GetElementAt(UIElement*& result, UIElement* current, const IntVector2& 
                                 i += (toSkip - 1);
                         }
                     }
+                    // Note: we cannot check for the up / left limits of positioning, since the element may be off the visible
+                    // screen but some of its layouted children will yet be visible. In down & right directions we can terminate
+                    // the loop, since all further children will be further down or right.
                     else if (parentLayoutMode == LM_HORIZONTAL)
                     {
-                        if (element->GetScreenPosition().x_ < rootElement_->GetPosition().x_)
-                            break;
-
                         if (element->GetScreenPosition().x_ >= rootElement_->GetPosition().x_ + rootElement_->GetSize().x_)
                             break;
                     }
                     else if (parentLayoutMode == LM_VERTICAL)
                     {
-                        if (element->GetScreenPosition().y_ < rootElement_->GetPosition().y_)
-                            break;
-
                         if (element->GetScreenPosition().y_ >= rootElement_->GetPosition().y_ + rootElement_->GetSize().y_)
                             break;
                     }

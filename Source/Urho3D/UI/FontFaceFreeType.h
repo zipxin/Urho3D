@@ -40,7 +40,7 @@ public:
     ~FontFaceFreeType();
 
     /// Load font face.
-    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, int pointSize);
+    virtual bool Load(const unsigned char* fontData, unsigned fontDataSize, float pointSize);
     /// Return pointer to the glyph structure corresponding to a character. Return null if glyph not found.
     virtual const FontGlyph* GetGlyph(unsigned c);
 
@@ -48,8 +48,6 @@ public:
     virtual bool HasMutableGlyphs() const { return hasMutableGlyph_; }
 
 private:
-    /// Check can load all glyph in one texture, return true and texture size if can load.
-    bool CanLoadAllGlyphs(const PODVector<unsigned>& charCodes, int& textureWidth, int& textureHeight) const;
     /// Setup next texture.
     bool SetupNextTexture(int textureWidth, int textureHeight);
     /// Load char glyph.
